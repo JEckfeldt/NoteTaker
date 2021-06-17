@@ -1,6 +1,7 @@
 const express = require('express')
 const { join } = require('path')
 const htmlRoutes = require('./routes/htmlRoutes')
+const apiRoutes = require('./routes/apiRoutes')
 
 const app = express()
 
@@ -13,6 +14,7 @@ app.use(express.urlencoded({extended: true}))
 
 //route links
 app.use('/', htmlRoutes)
+app.use('/api', apiRoutes)
 
 //start app
 const PORT = process.env.PORT || 3000
