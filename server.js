@@ -1,61 +1,54 @@
 const express = require('express')
-const { join } = require('path')
-const { uid } = require('uid')
+const path = require('path')
 const fs = require('fs')
+const uid = require('uid')
 const app = express()
 
-//data parsing
-app.use(express.static(join(__dirname, 'public')))
+
+app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+
 
 let notes = require('./db/db.json')
 
 //HTML ROUTES
-
-//get notes
 app.get('/notes', (req, res) => {
-  res.sendFile(join(__dirname, './public/notes.html'))
+  res.sendFile(path.join(__dirname, 'public', 'notes.html'))
 })
 
-//catch all case
-app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, './public/index.html'))
-})
 
-//API ROUTES
-
-//get api json
+// API ROUTES
+//get notes
 app.get('/api/notes', (req, res) => {
   res.json(notes)
 })
 
 //add new note
-app.post('api/notes', (req, res) => {
-  //make new note with uid
-  const newNote = {
-    id: uid(),
+app.post('/api/notes', (req, res) => {
+  const note = {
+    id: uid.uid(),
     ...req.body
   }
-  //add to notes
-  notes.push(newNote)
+  notes.push(note)
 
-  //write notes to db.json
-  fs.writeFile(join(__dirname, './db/db.json'), JSON.stringify(notes), err => {
-    if(err) {console.log(err)}
+  fs.writeFile(path.join(__dirname, 'db', 'db.json'), JSON.stringify(notes), err => {
+    if (err) { console.log(err) }
+    console.log('file written')
   })
 
   res.json(notes)
 })
 
-//delete with ID
+// delete by ID
 app.delete('/api/notes/:id', (req, res) => {
-  //filter notes by id
-  notes = notes.filter(note => note.id !== req.params.id)
+  notes = notes.filter(note =>
+    note.id !== req.params.id
+  )
 
-  //write notes to db.json
-  fs.writeFile(join(__dirname, './db/db.json'), JSON.stringify(notes), err => {
+  fs.writeFile(path.join(__dirname, 'db', 'db.json'), JSON.stringify(notes), err => {
     if (err) { console.log(err) }
+    console.log('file written')
   })
 
   res.json(notes)
