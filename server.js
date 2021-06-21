@@ -1,19 +1,36 @@
 const express = require('express')
 const { join } = require('path')
-const routes = require('./routes/routes.js')
-// const apiRoutes = require('./routes/apiRoutes')
-
+const uid = require('uid')
+const fs = require('fs')
 const app = express()
 
-//link css and js to html in public
+//data parsing
 app.use(express.static(join(__dirname, 'public')))
-
-//setup data parsing
+app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
-app.use(express.urlencoded({extended: true}))
 
-//route links
-app.use('/', routes)
+let notes = require('./db/db.json')
+
+//HTML ROUTES
+
+//get notes
+app.get('/notes', (req, res) => {
+  res.sendFile(join(__dirname, './public/notes.html'))
+})
+
+//catch all case
+app.get('*', (req, res) => {
+  res.sendFile(join(__dirname, './public/index.html'))
+})
+
+//API ROUTES
+
+//get api json
+app.get('/api/notes', (req, res) => {
+  res.json(notes)
+})
+
+
 
 //start app
 const PORT = process.env.PORT || 3000
